@@ -3,6 +3,7 @@
 
 import sys
 
+
 #Fonction pour lire le fichier d'input. Vous ne deviez pas avoir besoin de la modifier.
 #Retourne la liste des noms d'étudiants (students) et la liste des paires qui ne peuvent
 #doivent pas être mis dans le même groupe (pairs)
@@ -27,50 +28,102 @@ def read(fileName):
 
     return students, pairs
 
-
-#Fonction qui écrit dans le fichier d'output. 
+#Fonction qui écrit dans le fichier d'output.
 #le paramètre content est un string
-#
-#Function that writes in the output file.
-#The content parameter is a string
 def write(fileName, content):
     Outputfile = open(fileName, "w")
     Outputfile.write(content)
     Outputfile.close()
 
 #Fonction principale à compléter.
-#students : liste des noms des étudiants
-#pairs : liste des paires d'étudiants à ne pas grouper ensemble
-#        chaque paire est sous format de liste [x, y]
+
+# students : liste des noms des étudiants
+# pairs : liste des paires d'étudiants à ne pas grouper ensemble
+#         chaque paire est sous format de liste [x, y]
+
 #Valeur de retour : string contenant la réponse. Si c'est impossible, retourner "impossible"
 #                   Sinon, retourner en un string les deux lignes représentant les
 #                   les deux groupes d'étudants (les étudiants sont séparés par des
 #                   espaces et les deux lignes séparées par un \n)
-#
-#Function to complete
-#students : list of student names
-#pairs : list of pairs of students that shouldn't be grouped together.
-#        each pair is given as a list [x, y]
-#Return value : string with the output. If it is impossible, return "impossible".
-#               otherwise, return in a single string both ouput lines that contain
-#               two groups (students are separated by spaces and the two lines by a \n)
+class Node :
+    def __init__(self, valeur, liste_voisins, couleur=None):
+        self.couleur = couleur
+        self.valeur = valeur
+        self.liste_voisins = []
+
+    def add_voisin(self, voisin):
+        if voisin not in self.liste_voisins :
+            self.liste_voisins.append(voisin)
+
+
+def init_graphe(students):
+    noeuds = []
+    for i in range(len(students)) :
+        noeuds.append(Node(students[i], []))
+    return noeuds
+
+def noeud_recherche(trouve, noeuds) :
+    for node in noeuds :
+        if node.valeur == trouve :
+            return node
+def connexion(noeuds, pairs) :
+    for i in range(len(pairs)) :
+        for node in noeuds :
+            if pairs[i][0] == node.valeur :
+                node.add_voisin(noeud_recherche(pairs[i][1],noeuds))
+            elif pairs[i][1] == node.valeur :
+                node.add_voisin(noeud_recherche(pairs[i][0], noeuds))
+
+def colorier(node, voisin) :
+    if node.couleur == 'Rouge' :
+        voisin.couleur = 'Bleu'
+
+    elif node.couleur == 'Bleu' :
+        voisin.couleur = 'Rouge'
+
+def coloriage(node, visited) :
+    visited.add(node)
+    if node.liste_voisins != [] :
+        for voisin in node.liste_voisins :
+            if voisin not in visited:
+                colorier(node, voisin)
+                coloriage(voisin, visited)
+
 def createGroups(students, pairs):
-    # TODO : Compléter ici/Complete here...
-    # Vous pouvez découper votre code en d'autres fonctions...
-    # You may split your code in other functions...
-    return "impossible"
-    
+    noeuds = init_graphe(students)
+    connexion(noeuds, pairs)
+
+    visited = set()
+    groupe1 = []
+    groupe2 = []
+    for node in noeuds :
+        if node not in visited:
+            node.couleur = 'Rouge'
+            coloriage(node, visited)
+        if node.couleur == 'Rouge' or node.couleur == None :
+            groupe1.append(node.valeur)
+
+        elif node.couleur == 'Bleu' :
+            groupe2.append(node.valeur)
+
+    return groupe1, groupe2
 
 
 #Normalement, vous ne devriez pas avoir à modifier
-#Normaly, you shouldn't need to modify
+
 def main(args):
-    input_file = args[0]
-    output_file = args[1]
+    #input_file = args[0]
+    #output_file = args[1]
+    input_file = "input0.txt"
+
+    output_file = "output.txt"
     students, pairs = read(input_file)
-    output = createGroups(students, pairs)
-    write(output_file, output)
-            
+    output, output_bis = createGroups(students, pairs)
+    write(output_file, ' '.join(output)+ '\n')
+
+    with open(output_file, 'a') as file:
+        write(output_file, ' '.join(output_bis))
+
 
 #Ne pas changer
 #Don't change
