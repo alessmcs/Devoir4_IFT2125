@@ -7,10 +7,7 @@ import sys
 #Fonction pour lire le fichier d'input. Vous ne deviez pas avoir besoin de la modifier.
 #Retourne la liste des noms d'étudiants (students) et la liste des paires qui ne peuvent
 #doivent pas être mis dans le même groupe (pairs)
-#
-#Function to read the input file. You shouldn't have to modify it.
-#Returns the list of student names (students) and the list of pairs of students that
-#shouldn't be put in the same group (pairs)
+
 def read(fileName):
     # lecture du fichier
     fileIn = open(fileName,"r")
@@ -32,6 +29,11 @@ def read(fileName):
 #le paramètre content est un string
 def write(fileName, content):
     Outputfile = open(fileName, "w")
+    Outputfile.write(content)
+    Outputfile.close()
+
+def ajout(fileName, content):
+    Outputfile = open(fileName, "a")
     Outputfile.write(content)
     Outputfile.close()
 
@@ -67,12 +69,17 @@ def noeud_recherche(trouve, noeuds) :
         if node.valeur == trouve :
             return node
 def connexion(noeuds, pairs) :
+    d = {}
+    for node in noeuds :
+        d[node.valeur] = node
+        # LIAM = noeud : Liam
     for i in range(len(pairs)) :
-        for node in noeuds :
-            if pairs[i][0] == node.valeur :
-                node.add_voisin(noeud_recherche(pairs[i][1],noeuds))
-            elif pairs[i][1] == node.valeur :
-                node.add_voisin(noeud_recherche(pairs[i][0], noeuds))
+        a = d[pairs[i][0]]
+        b = d[pairs[i][1]]
+
+        a.add_voisin(b)
+        b.add_voisin(a)
+
 
 def colorier(node, voisin) :
     if node.couleur == 'Rouge' :
@@ -81,18 +88,26 @@ def colorier(node, voisin) :
     elif node.couleur == 'Bleu' :
         voisin.couleur = 'Rouge'
 
+estValide = True
 def coloriage(node, visited) :
+    global estValide
     visited.add(node)
+    if not estValide: return
     if node.liste_voisins != [] :
         for voisin in node.liste_voisins :
             if voisin not in visited:
                 colorier(node, voisin)
                 coloriage(voisin, visited)
+            else :
+                if voisin.couleur == node.couleur:
+                    estValide = False
 
 def createGroups(students, pairs):
     noeuds = init_graphe(students)
     connexion(noeuds, pairs)
 
+    global estValide
+    estValide = True
     visited = set()
     groupe1 = []
     groupe2 = []
@@ -100,29 +115,37 @@ def createGroups(students, pairs):
         if node not in visited:
             node.couleur = 'Rouge'
             coloriage(node, visited)
-        if node.couleur == 'Rouge' or node.couleur == None :
+        if node.couleur == 'Rouge':
             groupe1.append(node.valeur)
-
-        elif node.couleur == 'Bleu' :
+        elif node.couleur == 'Bleu':
             groupe2.append(node.valeur)
 
-    return groupe1, groupe2
+    if estValide and len(groupe1) != 0 and len(groupe2) != 0:
+        return groupe1, groupe2
+    else:
+        estValide = False
+        return "impossible"
 
 
 #Normalement, vous ne devriez pas avoir à modifier
 
 def main(args):
-    #input_file = args[0]
-    #output_file = args[1]
-    input_file = "input0.txt"
-
-    output_file = "output.txt"
+    input_file = args[0]
+    global estValide
+    estValide = True
+    output_file = args[1]
+    sys.setrecursionlimit(1000000)
+    # input_file = "input4.txt"
+    # output_file = "output.txt"
     students, pairs = read(input_file)
-    output, output_bis = createGroups(students, pairs)
-    write(output_file, ' '.join(output)+ '\n')
 
-    with open(output_file, 'a') as file:
-        write(output_file, ' '.join(output_bis))
+    output = createGroups(students, pairs)
+    if estValide :
+        write(output_file, ' '.join(output[0]) + '\n')
+        ajout(output_file, ' '.join(output[1]))
+    else :
+        write(output_file, output)
+
 
 
 #Ne pas changer
