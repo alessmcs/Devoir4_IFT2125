@@ -200,6 +200,56 @@ def main(args):
     # answering
     #write(output_file, str(answer))
     return
+
+    def deep_first_search(node, clique, adjacence, visited) :
+        visited.add(node)
+        clique.add(node)
+        for voisin in adjacence[node] :
+            if voisin not in visited :
+                deep_first_search(voisin, clique, adjacence, visited)
+
+    def clique_4_premier(adjacence) :
+        cliques = []
+        visited = set()
+
+        for node in adjacence :
+            if node not in visited :
+                clique = set()
+                deep_first_search(node, clique, adjacence, visited)
+                if len(clique) == 4:
+                    cliques.append(clique)
+
+        return cliques
+
+    # https://fr.wikipedia.org/wiki/Tri_fusion#Algorithme
+    def triFusion(L):
+        if len(L) == 1:
+            return L
+        else:
+            return fusion( triFusion(L[:len(L)//2]) , triFusion(L[len(L)//2:]) )
+
+    def fusion(A,B):
+        if len(A) == 0:
+            return B
+        elif len(B) == 0:
+            return A
+        elif A[0] <= B[0]:
+            return [A[0]] + fusion( A[1:] , B )
+        else:
+            return [B[0]] + fusion( A , B[1:] )
+
+
+    def trier_ensembles_sommes(cliques, n) :
+        global answer
+        dict = {}
+        somme = []
+        for clique in cliques :
+            somme.append(sum(clique))
+            dict[sum(clique)] = clique
+
+        somme_triee = triFusion(somme)
+
+        return somme_triee[n]
     
 
 # NE PAS TOUCHER
