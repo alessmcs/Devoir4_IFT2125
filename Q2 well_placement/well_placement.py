@@ -25,7 +25,6 @@ def read_problem(input_file):
         lignes.append(uneLigne)
         uneLigne = []
     
-    #print(lignes)
     file.close()
     return lignes
 
@@ -35,7 +34,8 @@ def lireTerrain(terrain):
         if '1' in  terrain[i]:
             for j in range(len(terrain[0])):
                 if terrain[i][j] == '1' : 
-                    tempSomme = voisinageIter(terrain, i, j)
+                    # bfs est plus rapide que dfs lorsque le graphe est très large
+                    tempSomme = bfs(terrain, i, j)
                     if tempSomme > meilleureSomme:
                         meilleureSomme = tempSomme
     return meilleureSomme
@@ -49,34 +49,23 @@ def calculerAdj(terrain,x,y):
             adj.append([terrain[nx][ny], nx, ny])
     return adj
 
-def voisinageIter(terrain,x,y):
-    stack = [] # sommets découverts 
-    stack.append([terrain[x][y],x,y]) # push root 
-    visited = set() 
+# implémenter le pseudocode vu en classe 
+def bfs(terrain,x,y):
+    queue = []
+    queue.append([terrain[x][y],x,y]) # push root 
     somme = 0
 
-    while(len(stack) != 0):
-        s = stack.pop()
-        #print(str(s) + 'somme = ' + str(somme))
+    while queue: 
+        s = tuple(queue.pop())
         x = s[1]
         y = s[2]
-        if s[0] == '1':
+        adj = calculerAdj(terrain, x, y) 
+        for a in adj:
+            if a[0] == '1':
+                queue.append(a)
+        if terrain[x][y] == '1':
             terrain[x][y] = '1v'
             somme += 1
-            adj = calculerAdj(terrain,x,y)
-            for a in adj: 
-                if a not in stack:
-                    stack.append(a)   
-
-    # while stack:
-    #     s = tuple(stack.pop())
-    #     x = s[1]
-    #     y = s[2]
-    #     if s not in visited and s[0] == '1':
-    #         visited.add(s)
-    #         somme += 1
-    #         adj = calculerAdj(terrain, x, y)
-    #         stack.extend(adj)
     return somme
 
 
@@ -91,7 +80,6 @@ def main(args):
     """Fonction main/Main function"""
     input_file = args[0]
     output_file = args[1]
-    #lignes = read_problem("/Users/alessandramancas/Desktop/Code Devoir 4/Q2 well_placement/input8.txt")
     lignes = read_problem(input_file)
 
     terrain = lignes[1:] # terrain est le reste de lignes
@@ -99,8 +87,6 @@ def main(args):
     # lire le terrain ligne par ligne et voir les 1 dans le voisinage des 1s
     resultat = lireTerrain(terrain)
     print(resultat)
-
-    #TODO: instead of using DFS and a huge recursion, use a stack (voir discord!!!!)
 
     write(output_file, str(resultat))
 

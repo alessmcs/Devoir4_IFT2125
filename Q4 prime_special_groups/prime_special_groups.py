@@ -88,20 +88,41 @@ def deep_first_search(node, clique, adjacence, visited) :
     visited.add(node)
     clique.add(node)
     for voisin in adjacence[node] :
-        if voisin not in visited :
+        if voisin not in visited and (voisin not in clique):
             deep_first_search(voisin, clique, adjacence, visited)
 
-def clique_4_premier(adjacence) :
-    cliques = []
+
+def clique_4_premier(adjacence, cliquesExistantes) :
+
+    # def etendre_clique(cliqueActuelle):
+    #     if len(cliqueActuelle) == 4:
+    #         special_pair = all(testPaireSpeciale(a, b) for a in cliqueActuelle for b in cliqueActuelle if a != b)
+    #         if special_pair:
+    #             cliques.add(cliqueActuelle)
+    #     elif len(cliqueActuelle) < 4:
+    #         for voisin in adjacence[cliqueActuelle[-1]]:
+    #             if all(voisin in adjacence[node] for node in cliqueActuelle):
+    #                 etendre_clique(adjacence[voisin])
+    
+    # cliques = [set(c) for c in cliquesExistantes]
+    # for node in adjacence:
+    #     etendre_clique(adjacence[node])
+    # return cliques
+    
+    #   FONCTION ORIGINAL DONT DELETE 
+    cliques = [set(c) for c in cliquesExistantes]
     visited = set()
 
     for node in adjacence :
         if node not in visited :
+            print(node)
             clique = set()
             deep_first_search(node, clique, adjacence, visited)
-            if len(clique) == 4:
-                cliques.append(clique)
-
+            if len(clique) == 4 and clique not in cliquesExistantes:
+                special_pair = all(testPaireSpeciale(a, b) for a in clique for b in clique if a != b)
+                if special_pair:
+                    cliques.append(clique)
+                    visited.add(node)
     return cliques
 
 # https://fr.wikipedia.org/wiki/Tri_fusion#Algorithme
@@ -122,7 +143,7 @@ def fusion(A,B):
         return [B[0]] + fusion( A , B[1:] )
 
 
-def trier_ensembles_sommes(cliques, n) :
+def trier_ensembles_sommes(cliques) :
     global answer
     dict = {}
     somme = []
@@ -132,17 +153,33 @@ def trier_ensembles_sommes(cliques, n) :
 
     somme_triee = triFusion(somme)
 
-    return somme_triee[n]
+    return somme_triee
 
 def main(args):
+    sys.setrecursionlimit(1000000) 
+    # tester dfs
+    # adjacence = {
+    #     1 : [2,3,4],
+    #     2 : [1,3,4],
+    #     3 : [1,2,4],
+    #     4 : [1,2,3],
+    #     5 : [6,4,2],
+    #     6 : [5]
+    # }
+    # cliquesExistantes = []
+    # cliquesTest = clique_4_premier(adjacence, cliquesExistantes)
+    # print(trier_ensembles_sommes(cliquesTest)[0])
+
     # # on check pour clique 
     # # continue until desired solution found: un ensemble spécial 
-
+    neme_elem = 1
     # construction du graphe
     edges = [] ; adj = {}
     n = 3 ; adj[3] = [] ; primes = [3]
+    reponse = 0
     solution = False
-    
+    cliquesExistantes = []
+    listeSommes = []
     while not solution: 
         b = nextPrime(n)
         primes.append(b)
@@ -156,10 +193,26 @@ def main(args):
 
                 adj[b].append(p)
                 adj[p].append(b)
-            # TODO; après avoir add le nombre, check s'il y a une clique speciale 
+                # trouve toutes les cliques de taille 4 une fois qu'on a ajouté un nouveau sommet/arêtes 
+                cliquesUpdated = clique_4_premier(adj,cliquesExistantes)
+                if len(cliquesExistantes) < len(cliquesUpdated):
+                    cliquesExistantes = cliquesUpdated
+                    print(cliquesExistantes)
+                    # retrier l'ensemble des sommes
+                    listeSommes = trier_ensembles_sommes(cliquesExistantes)
+                # regarder toutes les cliques d'avant et si on a add une clique, calculer sa somme et l'ajouter à la liste de sommes 
+                # check w/taille de la clique 
+                if len(listeSommes) == neme_elem:
+                    reponse = listeSommes[neme_elem]
+                    solution = True 
             n = b
         else:  # si n pas premier, passer au prochain 
             n += 1
+
+
+    
+    print(reponse)
+    return
 
     
 
