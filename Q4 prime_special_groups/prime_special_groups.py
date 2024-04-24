@@ -58,7 +58,10 @@ def BTest(n, k):
     if (1 < n <= 3 or n == 5):
         return True
     if (n <= 1 or n % 2 == 0 or n % 3 == 0 or n % 11 == 0):
-        return False
+        if n in [1,2,3,11]:
+            return True
+        else:
+            return False
 
     t = n - 1
     while (t % 2 == 0):
@@ -212,56 +215,12 @@ def main(args):
     cliquesExistantes = []
     listeSommes = []
 
-    # rouler le problème 
-    # while not solution:
-    #     b = nextPrime(n)
-    #     primes.append(b)
-    #     adj[b] = []
-    #     # voir la relation de ce nouveau nb premier avec les autres dans le graphe
-    #     for p in primes:
-    #         if testPaireSpeciale(p, b) and p != b:
-    #             # ajouter l'arête
-    #             if b == 1871:
-    #                 print('yes2')
-    #             edges.append([b, p])
-    #             edges.append([p, b])
-    #
-    #             adj[b].append(p)
-    #             adj[p].append(b)
-    #     # trouve toutes les cliques de taille 4 une fois qu'on a ajouté un nouveau sommet/arêtes
-    #     if b == 827:
-    #         print('yes')
-    #     if b == 1871:
-    #         print('yes2')
-    #     cliquesUpdated, visited = cliqueBacktrack([], adj, b, [b], {b})
-    #
-    #     # on a trouvé une clique
-    #     if cliquesUpdated not in cliquesExistantes:
-    #         if len(cliquesExistantes) == 0:
-    #             cliquesExistantes = cliquesUpdated
-    #         elif len(cliquesUpdated) > 0:
-    #             cliquesExistantes.append(cliquesUpdated[0])
-    #         print(len(cliquesExistantes))
-    #
-    #     # faire l'ensemble des sommes
-    #     if len(cliquesExistantes) == 100:
-    #         listeSommes = trier_ensembles_sommes(cliquesExistantes)
-    #         reponse = listeSommes[neme_elem - 1]
-    #         solution = True
-    #
-    #     n = b
-        # regarder toutes les cliques d'avant et si on a add une clique, calculer sa somme et l'ajouter à la liste de sommes
-        # check w/taille de la clique
-        # if len(listeSommes) == neme_elem:
-        #     reponse = listeSommes[neme_elem]
-        #     solution = True
 
+    nombre_de_permiers_dans_graphe = 800
 
-    nombre_de_permiers_dans_graphe = 500
-
-    if neme_elem > 15:
+    if neme_elem >= 15:
         nombre_de_permiers_dans_graphe = 900
-    if neme_elem > 40:
+    if neme_elem >= 40:
         nombre_de_permiers_dans_graphe = 1500
 
     for _ in range(nombre_de_permiers_dans_graphe):
@@ -303,7 +262,6 @@ def main(args):
         listeSommes.append(curr)
 
     listeSommes.sort()
-    print(listeSommes)
 
     reponse = listeSommes[neme_elem - 1]
     write(args[1], str(reponse))
