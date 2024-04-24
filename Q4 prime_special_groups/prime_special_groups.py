@@ -128,12 +128,9 @@ def deep_first_search(node, clique, adjacence, visited):
 #         cliqueTrouvee = set()
 #         for i in adj[node]:
 
-#SAM Excellent code pr backtrack, c le meme que le mien hehehe
 def cliqueBacktrack(cliquesExistantes, graphe, noeudActuel, cliqueActuelle):
     clique = cliqueActuelle
     # si le noeud actual a moins de 3 voisins, return
-    if len(clique) > 5:
-        return
     if len(graphe[noeudActuel]) < 3:
         return
 
@@ -143,11 +140,10 @@ def cliqueBacktrack(cliquesExistantes, graphe, noeudActuel, cliqueActuelle):
         return
     else:
         for voisin in graphe[noeudActuel]:
-            # and i not in v
             if voisin not in clique:
                 peuxAjouter = True
                 for elem in cliqueActuelle:
-                    if not elem in graphe[voisin]:
+                    if not (elem in graphe[voisin]):
                         peuxAjouter = False
                 if peuxAjouter:
                     tentative_clique = clique.copy()
@@ -204,7 +200,7 @@ def main(args):
 
     # # on check pour clique 
     # # continue until desired solution found: un ensemble spécial 
-    neme_elem = 3
+    neme_elem = int(args[0])
     # construction du graphe
     edges = [];
     adj = {}
@@ -261,16 +257,20 @@ def main(args):
         #     solution = True
 
 
-    #Version Sam
-    nombre_de_permiers_dans_graphe = 1200
+    nombre_de_permiers_dans_graphe = 500
+
+    if neme_elem > 15:
+        nombre_de_permiers_dans_graphe = 900
+    if neme_elem > 40:
+        nombre_de_permiers_dans_graphe = 1500
+
     for _ in range(nombre_de_permiers_dans_graphe):
         b = nextPrime(n)
         primes.append(b)
         adj[b] = []
-        n = b
+        n = b + 1
     # voir la relation de ce nouveau nb premier avec les autres dans le graphe
 
-    # SAM : Ici on ajoute toutes les arretes d'un seul coup, backtrack plus facile
     for prime1 in range(len(primes)):
         for prime2 in range(prime1 + 1, len(primes)):
             p = primes[prime1]
@@ -287,9 +287,11 @@ def main(args):
     count = 0
     # trouve toutes les cliques de taille 4 une fois qu'on a ajoute toutes les nodes
     for p in primes:
-        print(count)
+        # print(count)
         count += 1
-        cliqueBacktrack(cliquesExistantes, adj, p, [p])
+        arr = []
+        arr.append(p)
+        cliqueBacktrack(cliquesExistantes, adj, p, arr)
 
     # faire l'ensemble des sommes
     #listeSommes = trier_ensembles_sommes(cliquesExistantes)
@@ -302,16 +304,10 @@ def main(args):
 
     listeSommes.sort()
     print(listeSommes)
-    print(cliquesExistantes)
-    print("POUR TESTS")
-    print(listeSommes[0:3])
-    print(listeSommes[6])
-    print(listeSommes[25])
-
 
     reponse = listeSommes[neme_elem - 1]
-    print(reponse)
-    return reponse
+    write(args[1], str(reponse))
+    return
 
 
 # NE PAS TOUCHER
