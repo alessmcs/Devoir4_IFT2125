@@ -1,5 +1,5 @@
 # Alessandra MANCAS, 20249098
-# Nom, Matricule
+# Océane Hays (20240742)
 
 import sys
 

@@ -1,6 +1,5 @@
-#Nom, matricule
-#Nom, matricule
-
+# Océane Hays (20240742)
+# Alessandra Mancas (20249098)
 import sys
 
 
