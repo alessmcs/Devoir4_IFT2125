@@ -138,16 +138,7 @@ def cliqueBacktrack(cliquesExistantes, graphe, noeudActuel, cliqueActuelle):
         return
 
     if len(clique) == 4:
-        # une fois qu'on a trouvé une clique de taille 4, verifier si c'est special
-        special = True
-        for i in range(len(clique)):
-            for j in range(i + 1, len(clique)):
-                # print(clique[i])
-                # print(clique[j])
-                # print()
-                if not testPaireSpeciale(clique[i], clique[j]):
-                    special = False
-        if special == True and set(clique) not in cliquesExistantes:
+        if set(clique) not in cliquesExistantes:
             cliquesExistantes.append(set(clique))
         return
     else:
@@ -156,7 +147,7 @@ def cliqueBacktrack(cliquesExistantes, graphe, noeudActuel, cliqueActuelle):
             if voisin not in clique:
                 peuxAjouter = True
                 for elem in cliqueActuelle:
-                    if not testPaireSpeciale(elem, voisin):
+                    if not elem in graphe[voisin]:
                         peuxAjouter = False
                 if peuxAjouter:
                     tentative_clique = clique.copy()
@@ -271,7 +262,7 @@ def main(args):
 
 
     #Version Sam
-    nombre_de_permiers_dans_graphe = 780
+    nombre_de_permiers_dans_graphe = 1200
     for _ in range(nombre_de_permiers_dans_graphe):
         b = nextPrime(n)
         primes.append(b)
